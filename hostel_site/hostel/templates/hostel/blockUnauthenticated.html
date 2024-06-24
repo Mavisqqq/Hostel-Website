@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <title>Присоединиться к Блоку</title>
+</head>
+    <div style="text-align: center; margin: 0 15% 0 15%">
+        <h2>Введите номер блока, к которому хотите присоединиться </h2>
+        <br><br>
+        <form method="get" action="{% url 'addUserToBlock' %}">
+            <input type="text" name="s" placeholder="Поиск..." class="form-control">
+            <br><br>
+            <button type="submit" class="btn btn-primary btn-block">Присоединиться</button>
+        </form>
+    </div>
+
+{% endblock %}

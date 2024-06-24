@@ -1,0 +1,9 @@
+<div class="wp-block-footer" id="views_and_likes_dislikes">
+    <ul class="aux-info">
+        <li>
+            <button type="submit" style="background: transparent; border: none; box-shadow: none;" id="like_button"><i class="fa fa-thumbs-up" aria-hidden="true"> {{ news_item.likes.all.count }}</i></button>
+            <button type="submit" style="background: transparent; border: none; box-shadow: none;" id="dislike_button"><i class="fa fa-thumbs-down" aria-hidden="true"> {{ news_item.dislikes.all.count }}</i></button>
+        </li>
+        <li><i class="fa fa-eye" aria-hidden="true"> {{ news_item.views }}</i></li>
+    </ul>
+</div>

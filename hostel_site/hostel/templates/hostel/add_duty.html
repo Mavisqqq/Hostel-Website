@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <title>Создание дежурства</title>
+</head>
+<div style="margin: 0 25% 0 25%">
+    <h2>Добавить дежурство</h2>
+    <br>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <label for="images">Фото:</label>
+        <p><input name="images" type="file" multiple class="form-control-file" id="images" aria-describedby="imagesHelp"></p>
+        <small id="imagesHelp" class="form-text text-muted">*Необязательное поле</small>
+        <br><br>
+        <button type="submit" class="btn btn-primary btn-block">Добавить</button>
+    </form>
+</div>
+{% endblock %}

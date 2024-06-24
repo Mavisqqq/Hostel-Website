@@ -1,0 +1,152 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block content%}
+{% for item in ads_item %}
+<head>
+    <title>{{ item.title }}</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .full-image {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="card-header">
+                Объявление от: {{ item.user }}
+            </div>
+            <div class="col-md-2">
+                {% if item.imagead_set.all.count == 0 %}
+                    <img src="{% static "images/img.png" %}" alt="" width="235" height="235" class="full-image">
+                {% elif item.imagead_set.all.count == 1 %}
+                    {% for image in item.imagead_set.all %}
+                        {% if image.image%}
+                            <a href="{{ image.image.url }}"><img src="{{ image.image.url }}" alt="" width="235" height="235" class="full-image"></a>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in item.imagead_set.all %}
+                                <div class="carousel-item {% if forloop.first %} active {% endif %}">
+                                    {% if image.image%}
+                                        <a href="{{ image.image.url }}"><img src="{{ image.image.url }}" alt="" width="235" height="235" class="full-image"></a>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: black;border-radius: 30px;"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: black;border-radius: 30px;"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-9">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.title}}</h5>
+                    <input type="checkbox" class="read-more-checker" id="read-more-checker" />
+                    <div class="limiter">
+                        <p class="card-text">{{item.content}}</p>
+                        <div class="bottom"></div>
+                    </div>
+                    <label for="read-more-checker" class="read-more-button"></label>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <div style="float: left;">{{item.created_at}}</div>
+                <div style="float: right; padding-top: 5px"><i class="fa fa-eye" aria-hidden="true">{{ item.views }}</i></div>
+            </div>
+        </div>
+    </div>
+
+    {% if request.user.is_authenticated %}
+        <br><br>
+        <h3 class="text-center mb-4 pb-2">Комментарии</h3>
+        <p style="text-align: left">Ваш комментарий:</p>
+        <div style="display:flex">
+            <input type="text" id="id_comment_send_input" name="text" class="form-control">
+            <button type="submit" id="id_comment_send_button" class="btn btn-primary btn-block" style="margin-left: 5px"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+        </div>
+        <br><br>
+    {% else %}
+        <h5 style="color: red;">Для добавления комментариев необходимо <a href="{% url 'login' %}">авторизироваться</a></h5>
+    {% endif %}
+<div id="comment-section">
+    {% for comment in page_obj %}
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="d-flex flex-start">
+                    <img class="rounded-circle shadow-1-strong me-3" src="{% static "images/img_1.png" %}" alt="avatar" width="65" height="65" />
+                    <div class="flex-grow-1 flex-shrink-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-1">{{ comment.user }} <span class="small">- {{ comment.date_added }}</span></p>
+                        </div>
+                        <p class="small mb-0" style="word-break: break-all">{{ comment.text }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+    {% endfor %}
+    {% if page_obj.has_next %}
+        {% include 'include/paginator.html' %}
+    {% elif page_obj.has_previous %}
+        {% include 'include/paginator.html' %}
+    {% endif %}
+</div>
+    <script>
+      const commentSocket = new WebSocket("ws://" + window.location.host + "/");
+      commentSocket.onopen = function (e) {
+        console.log("The connection was setup successfully !");
+      };
+      commentSocket.onclose = function (e) {
+        console.log("Something unexpected happened !");
+      };
+      document.querySelector("#id_comment_send_input").focus();
+      document.querySelector("#id_comment_send_input").onkeyup = function (e) {
+        if (e.keyCode == 13) {
+          document.querySelector("#id_comment_send_button").click();
+        }
+      };
+      document.querySelector("#id_comment_send_button").onclick = function (e) {
+        var messageInput = document.querySelector(
+          "#id_comment_send_input"
+        ).value;
+        commentSocket.send(JSON.stringify({ message: messageInput, username : "{{request.user.username}}"}));
+      };
+      commentSocket.onmessage = function (e) {
+            e.preventDefault();
+            var message = $("#id_comment_send_input").val();
+            $.ajax({
+                type: "POST",
+                url: "{{ item.get_absolute_url }}",
+                data: {
+                    'text': message,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function() {
+                    updateChat();
+                    $("#id_comment_send_input").val('');
+                }
+            });
+
+        function updateChat() {
+            $.ajax({
+                type: "GET",
+                url: "{% url 'get_ads_comments' pk=item.id %}",
+                success: function(data) {
+                    $("#comment-section").html(data);
+                }
+            });
+      }
+}
+</script>
+{% endfor %}
+{%endblock%}

@@ -1,0 +1,41 @@
+<header class="p-3 text-bg-dark" style="position: fixed; width: 100%; z-index: 100">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="{% url 'Home' %}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none" style="font-size: 20px; padding-right: 15px">
+          Общежитие Яргу
+        </a>
+
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="{% url 'news' %}" class="nav-link px-2 text-white">Новости</a></li>
+          <li><a href="{% url 'ads' %}" class="nav-link px-2 text-white">Объявления</a></li>
+          <li><a href="{% url 'general_chat' %}" class="nav-link px-2 text-white">Чат</a></li>
+            <li><a href="{% url 'about_us' %}" class="nav-link px-2 text-white">О нас</a></li>
+        </ul>
+
+        <div class="text-end">
+            <div class="dropdown" style="position: relative; display: inline-block;">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-user" aria-hidden="true" style="font-size: 20px"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                      {% if request.user.is_authenticated %}
+                            <li><span class="dropdown-item" style="font-weight: bold">{{ user.username }}</span></li>
+                        {% if in_block == 1 %}
+                            <li><a class="dropdown-item" href="{% url 'blockAuthenticated' slug=block_slug %}">Мой блок</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'blockUnauthenticated' %}">Мой блок</a></li>
+                        {% endif %}
+                    {%else%}
+                          <li><a class="dropdown-item" href="{% url 'login' %}">Вход</a></li>
+                          <li><a class="dropdown-item" href="{% url 'register' %}">Регистрация</a></li>
+                    {%endif%}
+                    {%if request.user.is_authenticated%}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{%url 'logout'%}">Выход</a></li>
+                    {%endif%}
+                  </ul>
+                </div>
+        </div>
+      </div>
+    </div>
+</header>

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+    <title>Новости</title>
+    <link rel="stylesheet" href="{% static 'css/news.css' %}">
+</head>
+
+{% if request.user.is_superuser %}
+    <a href="{% url 'add_news' %}"><button>Добавить новость <i class="fa fa-plus" aria-hidden="true"></i></button></a>
+{% endif %}
+{% for item in page_obj.object_list %}
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="wp-block property list">
+            <div class="wp-block-body">
+              <div class="wp-block-img">
+                  {% if item.imagenews_set.all.count == 0 %}
+                    <img src="{% static "images/img.png" %}" alt="" width="235" height="235">
+                {% else %}
+                    {% for image in item.imagenews_set.all|slice:":1" %}
+                        {% if image.image%}
+                            <a href="{{ image.image.url }}"><img src="{{ image.image.url }}" alt="" width="235" height="235"></a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+              </div>
+              <div class="wp-block-content">
+                <small>
+                    {{ item.created_at }}
+                </small>
+                <h4 class="content-title">{{ item.title }}</h4>
+                <div class="limiter">
+                    <p class="description" style="word-break: break-all">{{ item.content }}</p>
+                    <div class="bottom"></div>
+                </div>
+                <label for="read-more-checker" class="read-more-button"></label>
+                <span class="pull-left">
+                    <a href="{{ item.get_absolute_url }}" class="btn btn-primary" style="margin-top: 15px">Читать далее</a>
+                </span>
+              </div>
+            </div>
+            <div class="wp-block-footer">
+              <ul class="aux-info">
+                  <li><i class="fa fa-thumbs-up" aria-hidden="true"> {{ item.likes.all.count }}</i> <i class="fa fa-thumbs-down" aria-hidden="true"> {{ item.dislikes.all.count }}</i></li>
+                  <li><i class="fa fa-comments" aria-hidden="true"> {{ item.commentnews_set.all.count }}</i></li>
+                  <li><i class="fa fa-eye" aria-hidden="true"> {{ item.views }}</i></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endfor %}
+    {% if page_obj.has_next %}
+        {% include 'include/paginator.html' %}
+    {% elif page_obj.has_previous %}
+        {% include 'include/paginator.html' %}
+    {% endif %}
+
+{% endblock %}

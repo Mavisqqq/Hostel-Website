@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{%block content%}
+<head>
+    <title>Блок {{ block_title }}</title>
+    <style>
+        .all{
+            margin: 0 auto;
+            margin-top: 50px;
+            width: 200px;
+            text-align: center;
+        }
+        a{
+            text-decoration: none;
+        }
+    </style>
+</head>
+<div class="all">
+    <div class="card mb-3">
+        <div class="card-header text-center">
+            <h3 class="card-title" style="padding-top: 10px">Блок {{block_title}}</h3>
+        </div>
+            <p><a href="{% url 'block_chat' slug=block_slug %}">Чат</a></p>
+            <p><a href="{% url 'block_duty' slug=block_slug %}">Дежурства</a></p>
+            <p><a href="{% url 'leave_block' slug=block_slug %}">Выйти из блока</a></p>
+    </div>
+</div>
+{%endblock%}

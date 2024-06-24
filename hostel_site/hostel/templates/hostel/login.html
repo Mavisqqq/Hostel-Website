@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{%block content%}
+<head>
+    <title>Авторизация</title>
+    <style>
+        .all{
+            margin: 10% 30% 10% 30%;
+        }
+        .A{
+            text-decoration-line: underline;
+            padding-right: 15px;
+        }
+
+        a:hover{
+            text-decoration-line: none;
+        }
+    </style>
+</head>
+
+<div class="all">
+    <h2>Авторизация</h2>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div style="display: flex">
+            <a class="A" href="{% url 'register' %}" style="color: blue">Зарегистрироваться</a>
+            <a class="A" href="{% url 'password_reset' %}" style="color: blue">Забыли пароль?</a>
+        </div>
+        <br><br>
+        <button type="submit" class="btn btn-primary btn-block">Авторизация</button>
+    </form>
+</div>
+{%endblock%}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{%block content%}
+<head>
+    <title>Объявления</title>
+</head>
+    <a href="{% url 'add_ad' %}"><button>Добавить объявление <i class="fa fa-plus" aria-hidden="true"></i></button></a>
+    {% for item in page_obj.object_list %}
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="card-header">
+                Объявление от: {{ item.user }}
+            </div>
+            <div class="col-md-3">
+            {% if item.imagead_set.all.count == 0 %}
+                <img src="{% static "images/img.png" %}" alt="" width="235" height="235">
+            {% else %}
+                {% for image in item.imagead_set.all|slice:":1" %}
+                    {% if image.image%}
+                        <a href="{{ image.image.url }}"><img src="{{ image.image.url }}" alt="" width="235" height="235"></a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            </div>
+            <div class="col-md-9">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.title}}</h5>
+
+                    <div class="limiter">
+                        <p class="card-text">{{item.content}}</p>
+                        <div class="bottom"></div>
+                    </div>
+                    <label for="read-more-checker" class="read-more-button"></label>
+                    <a href="{{ item.get_absolute_url }}" class="btn btn-primary" style="margin-top: 15px">Читать далее</a>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <div style="float: left;">{{item.created_at}}</div>
+                <div style="float: right; padding-top: 5px"><i class="fa fa-eye" aria-hidden="true">{{ item.views }}</i></div>
+            </div>
+        </div>
+    </div>
+    {%endfor%}
+    {% if page_obj.has_next %}
+        {% include 'include/paginator.html' %}
+    {% elif page_obj.has_previous %}
+        {% include 'include/paginator.html' %}
+    {% endif %}
+{%endblock%}

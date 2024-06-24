@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+    <title>Дежурства</title>
+    <style>
+        .slider {
+            width: 235px;
+            height: 235px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+        }
+
+        .slide img {
+            width: 235px;
+            height: 235px;
+        }
+
+        .btn {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<a href="{% url 'add_duty' slug=block_slug %}"><button>Добавить дежурство <i class="fa fa-plus" aria-hidden="true"></i></button></a>
+<br>
+<table class="table">
+    <thead style="background: #efefef; border-radius: 30px;">
+        <tr>
+            <th>Дата дежурства</th>
+            <th>Комната</th>
+            <th>Ответственный</th>
+            <th>Фотографии</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in page_obj %}
+        <tr>
+            <td>{{ item.duty_date}}</td>
+            <td>{{ item.room }}</td>
+            <td>{{ item.responsible_person }}</td>
+            <td>
+                {% if item.imageduty_set.all.count == 0 %}
+                    <img src="{% static "images/img.png" %}" alt="" width="235">
+                {% elif item.imageduty_set.all.count == 1 %}
+                    {% for image in item.imageduty_set.all %}
+                        {% if image.image%}
+                            <a href="{{ image.image.url }}"><img src="{{ image.image.url }}" alt="" width="235" height="235"></a>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="slider" id="slider_{{ forloop.counter }}">
+                        {% for image in item.imageduty_set.all %}
+                            {% if image.image%}
+                                <div class="slide">
+                                    <a href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt=""></a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div style="margin-left: 18%">
+                        <button class="btn" onclick="plusSlide(-1, {{ forloop.counter }})"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+                        <button class="btn" onclick="plusSlide(1, {{ forloop.counter }})"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if page_obj.has_next %}
+    {% include 'include/paginator.html' %}
+{% elif page_obj.has_previous %}
+    {% include 'include/paginator.html' %}
+{% endif %}
+    <script>
+    function plusSlide(n, index) {
+        showSlides(slideIndex[index] += n, index);
+    }
+
+    function showSlides(n, index) {
+        let i;
+        const slides = document.querySelectorAll("#slider_" + index + " .slide");
+
+        if (n > slides.length) {
+            slideIndex[index] = 1;
+        }
+
+        if (n < 1) {
+            slideIndex[index] = slides.length;
+        }
+
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+
+        slides[slideIndex[index] - 1].style.display = "block";
+    }
+
+    let slideIndex = {};
+    {% for item in page_obj %}
+        slideIndex[{{ forloop.counter }}] = 1;
+    {% endfor %}
+
+    // Показываем первый слайд при загрузке страницы
+    {% for item in page_obj %}
+        showSlides(1, {{ forloop.counter }});
+    {% endfor %}
+</script>
+{% endblock %}

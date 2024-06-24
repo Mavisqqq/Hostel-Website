@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{%block content%}
+<head>
+    <title>Общежитие Яргу</title>
+    <link rel="stylesheet" href="{% static 'css/news.css' %}">
+    <style>
+        .all{
+            display: flex;
+            margin: 0 10% 0 10%;
+        }
+        #footer{
+            display: flex;
+            margin: 0 auto;
+        }
+        #footer#footer{
+            padding: 5px 5px 5px 5px;
+        }
+        a{
+            text-decoration: none;
+        }
+        </style>
+</head>
+
+    <div style="margin: 0 20% 0 20%">
+        <div style="text-align: left">
+            <ul style="list-style: none">
+                <li><span style="font-weight: bold; font-size: 23px; color: #2F281E">Добро пожаловать!</span></li>
+                <li><i class="fa fa-check" aria-hidden="true" style="color: #7C2F1D; font-size: 30px"></i><span style="font-weight: bold; font-size: 16px; color: #2F281E">В настоящее время в общежитии проживает около 500 студентов!</span></li>
+                <li><i class="fa fa-check" aria-hidden="true" style="color: #7C2F1D; font-size: 30px"></i><span style="font-weight: bold; font-size: 16px; color: #2F281E">Имеется комната для спортивных занятий, в которой установлены два тренажера, имеются гантели, гири!</span></li>
+                <li><i class="fa fa-check" aria-hidden="true" style="color: #7C2F1D; font-size: 30px"></i><span style="font-weight: bold; font-size: 16px; color: #2F281E">Неподалеку от здания расположена спортплощадка с полем для футбола и волейбольными площадками!</span></li>
+                <li><i class="fa fa-check" aria-hidden="true" style="color: #7C2F1D; font-size: 30px"></i><span style="font-weight: bold; font-size: 16px; color: #2F281E">Здание оборудовано средствами автоматического пожаротушения и видеонаблюдения!</span></li>
+                <li><i class="fa fa-check" aria-hidden="true" style="color: #7C2F1D; font-size: 30px"></i><span style="font-weight: bold; font-size: 16px; color: #2F281E">Проезд до здания студгородка осуществляется автобусом маршрута 22с от Красной Площади!</span></li>
+            </ul>
+        </div>
+</div>
+
+
+<p style="text-align: center; font-size: 30px; font-weight: bold; margin: 30px 0 50px 0">Последние новости</p>
+<div class="all">
+    {% for item in news_sorted|slice:":3" %}
+        <div class="card mb-3" style="margin: 0 30px 0 30px">
+            <div class="card-header text-center">
+                <a href="{{ item.get_absolute_url }}"><h5 class="card-title" style="padding-top: 10px">{{item.title}}</h5></a>
+            </div>
+            <div class="card-img" style="padding: 10px">
+                {% if item.imagenews_set.all.count == 0 %}
+                    <img src="{% static "images/img.png" %}" alt="" width="235">
+                {% else %}
+                    {% for image in item.imagenews_set.all|slice:':1' %}
+                        {% if image.image%}
+                            <a href="{{ item.get_absolute_url }}"><img src="{{ image.image.url }}" alt="" width="235" height="235"></a>
+                        {% endif %}
+                    {% endfor %}
+                    <br>
+                {% endif %}
+            </div>
+            <div class="card-footer" id="footer">
+                <i class="fa fa-thumbs-up" aria-hidden="true" id="footer"> {{ item.likes.all.count }}</i>
+                <i class="fa fa-thumbs-down" aria-hidden="true" id="footer"> {{ item.dislikes.all.count }}</i>
+                <i class="fa fa-comments" aria-hidden="true" id="footer"> {{ item.commentnews_set.all.count }}</i>
+                <i class="fa fa-eye" aria-hidden="true" id="footer"> {{ item.views }}</i>
+            </div>
+            <div class="card-footer" id="footer">
+                {{ item.created_at }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

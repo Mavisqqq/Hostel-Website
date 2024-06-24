@@ -1,0 +1,23 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<head>
+    <title>Регистрация</title>
+    <style>
+        .all{
+            margin: 10% 30% 10% 30%;
+        }
+    </style>
+</head>
+
+<div class="all">
+    <h2>Регистрация</h2>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <button type="submit" class="btn btn-primary btn-block">Регистрация</button>
+    </form>
+</div>
+{%endblock%}

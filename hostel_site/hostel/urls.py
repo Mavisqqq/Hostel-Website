@@ -1,0 +1,35 @@
+from django.urls import path
+
+from hostel.views import *
+
+urlpatterns = [
+    path('', index, name="Home"),
+    path('about_us/', about_us, name="about_us"),
+    path('register/', register, name='register'),
+    path('login/', user_login, name='login'),
+    path('logout/', user_logout, name='logout'),
+    path('activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/', activate, name='activate'),
+    path('password-reset/', UserForgotPasswordView.as_view(), name='password_reset'),
+    path('set-new-password/<uidb64>/<token>/', UserPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('blockAuthenticated/<str:slug>/', blockAuthenticated, name='blockAuthenticated'),
+    path('blockAuthenticated/leave_block/<str:slug>/', leave_block, name='leave_block'),
+    path('blockAuthenticated/block_chat/<str:slug>/', BlockChatView.as_view(), name='block_chat'),
+    path('get_block_messages/<str:slug>/', get_block_messages, name='get_block_messages'),
+    path('blockAuthenticated/block_duty/<str:slug>/', blockDuty, name='block_duty'),
+    path('blockAuthenticated/block_duty/add_duty/<str:slug>/', addDuty, name='add_duty'),
+    path('blockUnauthenticated/', BlockUnauthenticated.as_view(), name='blockUnauthenticated'),
+    path('addUserToBlock/', addUserToBlock, name='addUserToBlock'),
+    path('ads/', ads, name='ads'),
+    path('ads/view_ad/<int:pk>/', ViewAds.as_view(), name='view_ad'),
+    path('ads/add_ad/', add_ad, name='add_ad'),
+    path('get_ads_comments_template/<int:pk>/', get_ads_comments, name='get_ads_comments'),
+    path('general_chat/', GeneralChatView.as_view(), name='general_chat'),
+    path('get_general_chat_messages/', get_general_chat_messages, name='get_general_chat_messages'),
+    path('news/', news, name='news'),
+    path('news/view_news/<int:pk>/', ViewNews.as_view(), name='view_news'),
+    path('get_news_comments_template/<int:pk>/', get_news_comments, name='get_news_comments'),
+    path('news/add_news/', add_news, name='add_news'),
+    path('like/<int:pk>/', AddLike.as_view(), name='add_like'),
+    path('dislike/<int:pk>/', AddDislike.as_view(), name='add_dislike'),
+    path('get_news_footer_template/<int:pk>/', get_news_footer, name='get_news_footer'),
+]

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<head>
+    <title>Чат Блока</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<div style="text-align: center; margin: 0 20% 0 20%">
+    <h2>Чат</h2>
+    <p style="text-align: left">Ваше сообщение:</p>
+    <div style="display:flex">
+        <input type="text" id="id_message_send_input" name="text" class="form-control">
+        <button type="submit" id="id_message_send_button" class="btn btn-primary btn-block" style="margin-left: 5px"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+    </div>
+    <br><br>
+</div>
+<div id="chat-messages" style="margin: 0 20% 0 20%">
+    {% for message in page_obj %}
+        <ul class="list-unstyled text-white">
+            {% if request.user == message.user %}
+                <li class="d-flex justify-content-between mb-4">
+                      <div class="card mask-custom w-100">
+                          <div class="card-header d-flex justify-content-between p-3" style="border-bottom: 1px solid rgba(255,255,255,.3); background-color: #cce4ff">
+                              <p class="fw-bold mb-0">{{ message.user }}</p>
+                              <p class="small mb-0"> {{ message.date_added }}</p>
+                          </div>
+                          <div class="card-body">
+                              <p class="mb-0">{{ message.text }}</p>
+                          </div>
+                        </div>
+                        <img src="{% static "images/img_1.png" %}" alt="avatar"
+                            class="rounded-circle d-flex align-self-start ms-3 shadow-1-strong" width="60">
+                </li>
+            {% else %}
+                <li class="d-flex justify-content-between mb-4">
+                    <img src="{% static "images/img_1.png" %}" alt="avatar"
+                        class="rounded-circle d-flex align-self-start me-3" width="60">
+                    <div class="card mask-custom w-100">
+                        <div class="card-header d-flex justify-content-between p-3" style="border-bottom: 1px solid rgba(255,255,255,.3); background-color:  #A5A5A5">
+                            <p class="fw-bold mb-0">{{ message.user }}</p>
+                            <p class="small mb-0"><i class="far fa-clock"></i> {{ message.date_added }}</p>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">{{ message.text }}</p>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+        </ul>
+    {% endfor %}
+    {% if page_obj.has_next %}
+        {% include 'include/paginator.html' %}
+    {% elif page_obj.has_previous %}
+        {% include 'include/paginator.html' %}
+    {% endif %}
+</div>
+
+<script>
+      const chatSocket = new WebSocket("ws://" + window.location.host + "/");
+      chatSocket.onopen = function (e) {
+        console.log("The connection was setup successfully !");
+      };
+      chatSocket.onclose = function (e) {
+        console.log("Something unexpected happened !");
+      };
+      document.querySelector("#id_message_send_input").focus();
+      document.querySelector("#id_message_send_input").onkeyup = function (e) {
+        if (e.keyCode == 13) {
+          document.querySelector("#id_message_send_button").click();
+        }
+      };
+      document.querySelector("#id_message_send_button").onclick = function (e) {
+        var messageInput = document.querySelector(
+          "#id_message_send_input"
+        ).value;
+        chatSocket.send(JSON.stringify({ message: messageInput, username : "{{request.user.username}}"}));
+      };
+      chatSocket.onmessage = function (e) {
+            e.preventDefault();
+            var message = $("#id_message_send_input").val();
+            $.ajax({
+                type: "POST",
+                url: "{% url 'block_chat' slug=block_slug %}",
+                data: {
+                    'text': message,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function() {
+                    updateChat();
+                    $("#id_message_send_input").val('');
+                }
+            });
+
+        function updateChat() {
+            $.ajax({
+                type: "GET",
+                url: "{% url 'get_block_messages' slug=block_slug %}",
+                success: function(data) {
+                    $("#chat-messages").html(data);
+                }
+            });
+      }
+}
+</script>
+{% endblock %}
